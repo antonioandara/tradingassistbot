@@ -44,8 +44,13 @@ def check(update, context):
 
         symbol = data[1].upper()
         # this prevents a request that would otherwise return a message that's too long to display
-        if symbol == 'BTC' or symbol == 'ETH' or symbol == 'BNB':
-            msg = f'error in coin: {symbol} has too many pairs, choose another coin or a trading pair'
+        if len(symbol) < 3:
+            msg = f'Error. ticker {symbol} is too short and produces too many matches'
+            print(msg)
+            update.message.reply_text(msg)
+            return
+        elif symbol == 'BTC' or symbol == 'ETH' or symbol == 'BNB':
+            msg = f'Error. ticker: {symbol} has too many matches, try again.'
             print(msg)
             update.message.reply_text(msg)
             return
