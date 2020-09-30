@@ -14,8 +14,9 @@ import os
 if you want to hard code the API key directly (not recommended)
 #
 BOTKEY = "YOUR_BOT_KEY_HERE"
-
-
+# write function to replace this blocks
+#  print(msg)
+#  update.message.reply_text(msg)
 
 
 # Enable logging
