@@ -49,7 +49,7 @@ def check(update, context):
             print(msg)
             update.message.reply_text(msg)
             return
-        elif symbol == 'BTC' or symbol == 'ETH' or symbol == 'BNB':
+        elif symbol == 'BTC' or symbol == 'ETH' or symbol == 'BNB' or symbol == 'USDT' or symbol == 'USD':
             msg = f'Error. ticker: {symbol} has too many matches, try again.'
             print(msg)
             update.message.reply_text(msg)
