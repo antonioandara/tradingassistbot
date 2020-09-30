@@ -1,6 +1,6 @@
 import logging
 import Bittrexlite as bittrex
-import binance_API as bb
+import Binancelite as bb
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import telegram
 import os
