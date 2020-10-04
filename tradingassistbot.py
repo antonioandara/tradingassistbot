@@ -11,7 +11,7 @@ import os
 
 # BOTKEY = os.environ.get('TELEGRAM_BOT_API')
 
-if you want to hard code the API key directly (not recommended)
+# if you want to hard code the API key directly (not recommended)
 #
 BOTKEY = "YOUR_BOT_KEY_HERE"
 
