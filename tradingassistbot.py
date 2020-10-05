@@ -6,16 +6,11 @@ import telegram
 import os
 
 
-
 #if the API id data is stored as enviroment variable (recommended method)
-
 # BOTKEY = os.environ.get('TELEGRAM_BOT_API')
 
-if you want to hard code the API key directly (not recommended)
-#
+# if you want to hard code the API key directly (not recommended)
 BOTKEY = "YOUR_BOT_KEY_HERE"
-
-
 
 
 # Enable logging
@@ -32,8 +27,9 @@ def start(update, context):
     update.message.reply_text("To see a list of available commands text:\n/help")
     print(f'Trading Assistant Bot has started a conversation')
 
+    
 def check(update, context):
-    """checks the price of a crypto pair on the available exchanges.
+    """checks the price of any coin on the available exchanges.
         to do this it takes the first string after the command and matches
         it to any available pair from th exchanges
     """
