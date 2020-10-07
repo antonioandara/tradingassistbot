@@ -1,17 +1,16 @@
 import logging
 import Bittrexlite as bittrex
-import Binancelite as bb
+import Binancelite as binance
+import Bybitlite as bybit
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import telegram
 import os
 
-
-#if the API id data is stored as enviroment variable (recommended method)
+# if the API id data is stored as enviroment variable (recommended method)
 # BOTKEY = os.environ.get('TELEGRAM_BOT_API')
 
 # if you want to hard code the API key directly (not recommended)
 BOTKEY = "YOUR_BOT_KEY_HERE"
-
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
@@ -27,8 +26,8 @@ def start(update, context):
     update.message.reply_text("To see a list of available commands text:\n/help")
     print(f'Trading Assistant Bot has started a conversation')
 
-    
-def check(update, context):
+
+def checkprice(update, context):
     """checks the price of any coin on the available exchanges.
         to do this it takes the first string after the command and matches
         it to any available pair from th exchanges
@@ -64,19 +63,33 @@ def check(update, context):
                 # this takes care of the formatting and making sure telegram doesn't display number as hyperlinks
                 price = f'{price:.8f}' if price < 1 else f'{price}'
                 msg += f'{coin["symbol"]} price: `{price}`\n'
+        msg += f'No match' if msg == f'Matches for {symbol} on Bittrex:\n' else ''
         print(msg)
         update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN)
 
-        binancecoins = bb.price()
+        binancecoins = binance.price()
         msg = f'Matches for {symbol} on Binance:\n'
         for coin in binancecoins:
             if symbol in coin['symbol']:
                 price = float(coin['price'])
                 price = f'{price:.8f}' if price < 1 else f'{price}'
                 msg += f'{coin["symbol"]} price: `{price}`\n'
+        msg += f'No match' if msg == f'Matches for {symbol} on Binance:\n' else ''
+        print(msg)
+        update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN)
+
+        bybitcoins = bybit.tickers()
+        msg = f'Matches for {symbol} on Bybit:\n'
+        for coin in bybitcoins:
+            if symbol in coin['symbol']:
+                price = float(coin['last_price'])
+                price = f'{price:.8f}' if price < 1 else f'{price}'
+                msg += f'{coin["symbol"]} price: `{price}`\n'
+        msg += f'No match' if msg == f'Matches for {symbol} on Bybit:\n' else ''
         print(msg)
         update.message.reply_text(msg, parse_mode=telegram.ParseMode.MARKDOWN)
         return
+
     # in case no word is received after the command
     else:
         msg = f'The command /price will try to match any trading pairs with the symbol sent after the command.' \
@@ -96,7 +109,7 @@ def changeexchange(update, context):
     msg = f'Using {exchange}'
     print(msg)
     update.message.reply_text(msg)
-    return
+
 
 
 def alarm(update, context):
@@ -155,7 +168,7 @@ def alarm(update, context):
 
         elif exchange == 'binance':
             symbol = symbol.replace('-', '')
-            coin = bb.price(symbol)
+            coin = binance.price(symbol)
 
             if 'code' in coin.keys():
                 msg = f'code: {coin["code"]}\nsymbol "{symbol}" not recognized\ntry a pair of the form: BTCUSDT'
@@ -193,7 +206,7 @@ def createAlarm(exchange, symbol, price):
             coin = float(coin['lastTradeRate'])
 
         elif exchange == 'binance':
-            coin = bb.price(symbol)
+            coin = binance.price(symbol)
             coin = float(coin['price'])
         else:
             print(f'error in exchange')
@@ -208,7 +221,6 @@ def createAlarm(exchange, symbol, price):
             alarms[exchange][symbol] = []
             alarms[exchange][symbol].insert(0, data)
 
-
         print(f"alarms: {alarms}")
     else:
         print(f"price cannot be negative: {price}")
@@ -219,13 +231,14 @@ def help_command(update, context):
     """Sends a a list of available commands"""
     update.message.reply_text(f'Available commands:\n/start --> greeting\n/price --> check ticker price\n'
                               f'/alarm --> set an alarm\n/bittrex --> activate Bittrex\n'
-                              f'/binance --> activate Binance\n/help'
+                              f'/binance --> activate Binance\n/bybit --> activate Bybit\n/help'
                               f'\ntouch any for more info.')
 
 
 def echo(update, context):
     """when user sends a non command message"""
     update.message.reply_text(f'I do not understand that, try sending a command, or send /help for a list of commands')
+
 
 def main():
     """Start bot"""
@@ -236,7 +249,8 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("bittrex", changeexchange))
     dp.add_handler(CommandHandler("binance", changeexchange))
-    dp.add_handler(CommandHandler("price", check))
+    dp.add_handler(CommandHandler("bybit", changeexchange))
+    dp.add_handler(CommandHandler("price", checkprice))
     dp.add_handler(CommandHandler("alarm", alarm))
     dp.add_handler(CommandHandler("help", help_command))
     dp.add_handler(MessageHandler(Filters.text & ~Filters.command, echo))
