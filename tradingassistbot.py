@@ -178,6 +178,19 @@ def alarm(update, context):
             price = float(coin['price'])
             msg = f'Last price of {symbol} is `{price}`'
 
+        elif exchange == 'bybit':
+            symbol = symbol.replace('-', '')
+            coin = bybit.tickers(symbol)
+            if coin is None:
+                msg = f'code: {coin}\nsymbol "{symbol}" not available in this exchange'
+                print(msg)
+                update.message.reply_text(msg)
+                return
+            else:
+                coin = coin[0]
+                price = float(coin['last_price'])
+                msg = f'Last price of {symbol} is `{price}`'
+
     else:
         msg = f'The /alarm command receives 2 parameters:\n\nsymbol -> alarm price\n\n' \
               f'Example:\nto set an alarm for usd-btc at a price of 11000 send the command:' \
@@ -208,9 +221,14 @@ def createAlarm(exchange, symbol, price):
         elif exchange == 'binance':
             coin = binance.price(symbol)
             coin = float(coin['price'])
+
+        elif exchange == 'bybit':
+            coin = bybit.tickers(symbol)
+            coin = float(coin[0]['last_price'])
+
         else:
             print(f'error in exchange')
-            coin = None
+            coin = 0
 
         condition = '>' if coin < price else '<'
         data = (price, condition)
